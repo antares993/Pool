@@ -12,7 +12,7 @@ This library provides you simple pools. This is especially useful when working w
 You can add this library as a dependency using composer this way:
 
 ```
-composer require antares/pool dev-master
+composer require antares/pool
 ```
 
 ## Compatibility
