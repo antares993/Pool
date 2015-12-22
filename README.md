@@ -42,10 +42,10 @@ interface PoolInterface
     public function dispose($instance);
 
     // Set a set of callbacks for the events a resource can trigger
-    public function setEventsCallbacks($id, $callbacks);
+    public function addEventsCallbacks($id, $callbacks);
 
     // Set a callback to call when an event is triggered for given resource
-    public function setEventCallback($id, $event, $callback);
+    public function addEventCallback($id, $event, $callback);
 }
 ```
 
@@ -96,7 +96,7 @@ Here, the first time the pool is instanciated, its resources will be defined. Th
 
 ### Pool events
 
-You can attach a callback that will be called when some events are triggered by the pool.
+You can attach callbacks that will be called when some events are triggered by the pool.
 
 2 events may happen:
 
@@ -111,19 +111,28 @@ use Pool\PoolInterface;
 $pool = new Pool\Pool();
 
 $callbacks = [
-    PoolInterface::EVENT_GET => function($instance) {},
-    PoolInterface::EVENT_DISPOSE => function($instance) {}
+    PoolInterface::EVENT_GET => [function($instance) {}],
+    PoolInterface::EVENT_DISPOSE => [function($instance) {}]
 ];
 
 // 1. Define it with the generator
 $pool->set('foo', function() { return new Foo(); }, $callbacks);
 
 // 2. Define each event
-$pool->setEventCallback('foo', PoolInterface::EVENT_GET, $callbacks[PoolInterface::EVENT_GET]);
-$pool->setEventCallback('foo', PoolInterface::EVENT_DISPOSE, $callbacks[PoolInterface::EVENT_DISPOSE]);
+$pool->addEventCallback('foo', PoolInterface::EVENT_GET, $callbacks[PoolInterface::EVENT_GET][0]);
+$pool->addEventCallback('foo', PoolInterface::EVENT_DISPOSE, $callbacks[PoolInterface::EVENT_DISPOSE][0]);
 
 // 3. Define all callbacks in one method call
-$pool->setEventCallback('foo', $callback);
+$pool->addEventsCallbacks('foo', $callback);
+```
+
+Note that the callbacks are combinable.
+
+```php
+$pool->addEventCallback('foo', PoolInterface::EVENT_GET, function($instance) { echo 'a'; });
+$pool->addEventCallback('foo', PoolInterface::EVENT_GET, function($instance) { echo 'b'; });
+
+$pool->get('foo'); // will echo 'a' and 'b'
 ```
 
 Below is an example of how you can use callbacks.
@@ -136,8 +145,8 @@ class Foo {
 $counter = 0;
 $pool = new Pool\Pool();
 $pool->set('foo', function() { return new Foo(); }, [
-    PoolInterface::EVENT_GET => function($instance) { $instance->bar(); },
-    PoolInterface::EVENT_DISPOSE => function($instance) use (&$counter) { $counter++; }
+    PoolInterface::EVENT_GET => [function($instance) { $instance->bar(); }],
+    PoolInterface::EVENT_DISPOSE => [function($instance) use (&$counter) { $counter++; }]
 ]);
 
 $foo = $pool->get('foo'); // $foo->bar() is called

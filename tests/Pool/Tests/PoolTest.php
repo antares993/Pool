@@ -50,7 +50,7 @@ class PoolTest extends \PHPUnit_Framework_TestCase
         $pool = $this->getPool();
 
         $count = 0;
-        $pool->setEventCallback(
+        $pool->addEventCallback(
             'foo',
             PoolInterface::EVENT_GET,
             function($instance) use (&$count) { $count++; }
@@ -66,7 +66,7 @@ class PoolTest extends \PHPUnit_Framework_TestCase
         $pool = $this->getPool();
 
         $count = 0;
-        $pool->setEventCallback(
+        $pool->addEventCallback(
             'foo',
             PoolInterface::EVENT_DISPOSE,
             function($instance) use (&$count) { $count++; }
@@ -83,13 +83,13 @@ class PoolTest extends \PHPUnit_Framework_TestCase
         $pool = $this->getPool();
 
         $count = 0;
-        $pool->setEventsCallbacks('foo', [
-            PoolInterface::EVENT_GET => function($instance) use (&$count) {
+        $pool->addEventsCallbacks('foo', [
+            PoolInterface::EVENT_GET => [function($instance) use (&$count) {
                 $count++;
-            },
-            PoolInterface::EVENT_DISPOSE => function($instance) use (&$count) {
+            }],
+            PoolInterface::EVENT_DISPOSE => [function($instance) use (&$count) {
                 $count++;
-            }
+            }]
         ]);
 
         $instance = $pool->get('foo');

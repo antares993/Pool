@@ -16,7 +16,7 @@ interface PoolInterface
      * @param callback $generator
      * @param array $eventsCallbacks
      */
-    public function set($id, $generator, $eventsCallbacks = null);
+    public function set($id, $generator, array $eventsCallbacks = null);
 
     /**
      * Get an instance from the pool.
@@ -44,7 +44,7 @@ interface PoolInterface
      *
      * @return self
      */
-    public function setEventsCallbacks($id, $callbacks);
+    public function addEventsCallbacks($id, array $callbacks);
 
     /**
      * Set the callback function applied to given event.
@@ -55,5 +55,5 @@ interface PoolInterface
      *
      * @return self
      */
-    public function setEventCallback($id, $event, $callback);
+    public function addEventCallback($id, $event, $callback);
 }

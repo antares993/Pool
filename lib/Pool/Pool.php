@@ -42,12 +42,12 @@ class Pool implements PoolInterface
     /**
      * {@inheritdoc}
      */
-    public function set($id, $generator, $eventsCallbacks = null)
+    public function set($id, $generator, array $eventsCallbacks = null)
     {
         $this->generators[$id] = $generator;
 
         if ($eventsCallbacks !== null) {
-            $this->setEventsCallbacks($eventsCallbacks);
+            $this->addEventsCallbacks($eventsCallbacks);
         }
 
         $this->instancesHashes[$id] = array(
@@ -79,7 +79,9 @@ class Pool implements PoolInterface
         }
 
         if (!empty($this->eventsCallbacks[$id][PoolInterface::EVENT_GET])) {
-            $this->eventsCallbacks[$id][PoolInterface::EVENT_GET]($instance);
+            foreach ($this->eventsCallbacks[$id][PoolInterface::EVENT_GET] as $callback) {
+                $callback($instance);
+            }
         }
 
         return $instance;
@@ -117,7 +119,9 @@ class Pool implements PoolInterface
         $id = $this->instances[$hash]['id'];
 
         if (!empty($this->eventsCallbacks[$id][PoolInterface::EVENT_DISPOSE])) {
-            $this->eventsCallbacks[$id][PoolInterface::EVENT_DISPOSE]($instance);
+            foreach ($this->eventsCallbacks[$id][PoolInterface::EVENT_DISPOSE] as $callback) {
+                $callback($instance);
+            }
         }
 
         $this->instances[$hash]['available'] = true;
@@ -129,10 +133,12 @@ class Pool implements PoolInterface
     /**
      * {@inheritdoc}
      */
-    public function setEventsCallbacks($id, $callbacks)
+    public function addEventsCallbacks($id, array $callbacks)
     {
-        foreach ($callbacks as $event => $callback) {
-            $this->setEventCallback($id, $event, $callback);
+        foreach ($callbacks as $event => $callbackList) {
+            foreach ($callbackList as $callback) {
+                $this->addEventCallback($id, $event, $callback);
+            }
         }
         return $this;
     }
@@ -140,9 +146,13 @@ class Pool implements PoolInterface
     /**
      * {@inheritdoc}
      */
-    public function setEventCallback($id, $event, $callback)
+    public function addEventCallback($id, $event, $callback)
     {
-        $this->eventsCallbacks[$id][$event] = $callback;
+        if (empty($this->eventsCallbacks[$id][$event])) {
+            $this->eventsCallbacks[$id][$event] = array();
+        }
+
+        $this->eventsCallbacks[$id][$event][] = $callback;
         return $this;
     }
 }

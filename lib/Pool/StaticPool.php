@@ -61,7 +61,7 @@ class StaticPool implements PoolInterface
     /**
      * {@inheritdoc}
      */
-    public function set($id, $generator, $eventsCallbacks = null)
+    public function set($id, $generator, array $eventsCallbacks = null)
     {
         self::$pool->set($id, $generator, $eventsCallbacks);
         return $this;
@@ -87,18 +87,18 @@ class StaticPool implements PoolInterface
     /**
      * {@inheritdoc}
      */
-    public function setEventsCallbacks($id, $callbacks)
+    public function addEventsCallbacks($id, array $callbacks)
     {
-        self::$pool->setEventsCallbacks($id, $callbacks);
+        self::$pool->addEventsCallbacks($id, $callbacks);
         return $this;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setEventCallback($id, $event, $callback)
+    public function addEventCallback($id, $event, $callback)
     {
-        self::$pool->setEventCallback($id, $event, $callback);
+        self::$pool->addEventCallback($id, $event, $callback);
         return $this;
     }
 }
