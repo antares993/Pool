@@ -80,7 +80,7 @@ class StaticPool implements PoolInterface
      */
     public function dispose($instance)
     {
-        return self::$pool->dispose($instance);
+        self::$pool->dispose($instance);
         return $this;
     }
 
