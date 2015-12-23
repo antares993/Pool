@@ -41,6 +41,9 @@ interface PoolInterface
     // Free the instance of the resource
     public function dispose($instance);
 
+    // Clear the pool
+    public function clear();
+
     // Set a set of callbacks for the events a resource can trigger
     public function addEventsCallbacks($id, $callbacks);
 
@@ -98,10 +101,12 @@ Here, the first time the pool is instanciated, its resources will be defined. Th
 
 You can attach callbacks that will be called when some events are triggered by the pool.
 
-2 events may happen:
+4 events may happen:
 
 - `PoolInterface::EVENT_GET` when the instance of a resource is pulled from the pool (when calling `$pool->get($id)`)
 - `PoolInterface::EVENT_DISPOSE` when the instance is released (when calling `$pool->dispose($instance)`)
+- `PoolInterface::EVENT_CREATE` when the instance is created (when calling `$pool->get($id)` if the instance has not been already created)
+- `PoolInterface::EVENT_DESTRUCT` when the instance is destructed (when calling `$pool->clear()`)
 
 There are 3 ways to define callbacks:
 

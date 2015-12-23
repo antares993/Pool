@@ -87,6 +87,15 @@ class StaticPool implements PoolInterface
     /**
      * {@inheritdoc}
      */
+    public function clear()
+    {
+        self::$pool->clear();
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function addEventsCallbacks($id, array $callbacks)
     {
         self::$pool->addEventsCallbacks($id, $callbacks);

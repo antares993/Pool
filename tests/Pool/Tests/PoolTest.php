@@ -78,6 +78,40 @@ class PoolTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $count);
     }
 
+    public function testCreateEvent()
+    {
+        $pool = $this->getPool();
+
+        $count = 0;
+        $pool->addEventCallback(
+            'foo',
+            PoolInterface::EVENT_CREATE,
+            function($instance) use (&$count) { $count++; }
+        );
+
+        $instance = $pool->get('foo');
+
+        $this->assertEquals(1, $count);
+    }
+
+    public function testDestructEvent()
+    {
+        $pool = $this->getPool();
+
+        $count = 0;
+        $pool->addEventCallback(
+            'foo',
+            PoolInterface::EVENT_DESTRUCT,
+            function($instance) use (&$count) { $count++; }
+        );
+
+        $instance = $pool->get('foo');
+        $pool->dispose($instance);
+        $pool->clear();
+
+        $this->assertEquals(1, $count);
+    }
+
     public function testMultipleEvents()
     {
         $pool = $this->getPool();

@@ -8,6 +8,10 @@ interface PoolInterface
 
     const EVENT_DISPOSE = 'dispose';
 
+    const EVENT_CREATE = 'create';
+
+    const EVENT_DESTRUCT = 'destruct';
+
     /**
      * Add a generator to the pool.
      * The generator is a function that return a new instance of the wanted object.
@@ -35,6 +39,11 @@ interface PoolInterface
      * @return self
      */
     public function dispose($instance);
+
+    /**
+     * Clear the pool.
+     */
+    public function clear();
 
     /**
      * Set the events callbacks for given id.

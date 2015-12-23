@@ -45,6 +45,7 @@ class Pool implements PoolInterface
     public function set($id, $generator, array $eventsCallbacks = null)
     {
         $this->generators[$id] = $generator;
+        $this->eventsCallbacks[$id] = array();
 
         if ($eventsCallbacks !== null) {
             $this->addEventsCallbacks($eventsCallbacks);
@@ -78,11 +79,7 @@ class Pool implements PoolInterface
             }
         }
 
-        if (!empty($this->eventsCallbacks[$id][PoolInterface::EVENT_GET])) {
-            foreach ($this->eventsCallbacks[$id][PoolInterface::EVENT_GET] as $callback) {
-                $callback($instance);
-            }
-        }
+        $this->triggerEvent($id, PoolInterface::EVENT_GET, $instance);
 
         return $instance;
     }
@@ -98,6 +95,8 @@ class Pool implements PoolInterface
     {
         $instance = $this->generators[$id]();
         $hash = spl_object_hash($instance);
+
+        $this->triggerEvent($id, PoolInterface::EVENT_CREATE, $instance);
 
         $this->instances[$hash] = array(
             'id' => $id,
@@ -118,16 +117,32 @@ class Pool implements PoolInterface
         $hash = spl_object_hash($instance);
         $id = $this->instances[$hash]['id'];
 
-        if (!empty($this->eventsCallbacks[$id][PoolInterface::EVENT_DISPOSE])) {
-            foreach ($this->eventsCallbacks[$id][PoolInterface::EVENT_DISPOSE] as $callback) {
-                $callback($instance);
-            }
-        }
+        $this->triggerEvent($id, PoolInterface::EVENT_DISPOSE, $instance);
 
         $this->instances[$hash]['available'] = true;
         $this->instancesHashes[$id]['availableCount']++;
 
         return $this;
+    }
+
+    public function clear()
+    {
+        foreach ($this->instancesHashes as $id => $hashesList) {
+            foreach ($hashesList['hashes'] as $hash) {
+                $instance = $this->instances[$hash]['instance'];
+                if (!$this->instances[$hash]['available']) {
+                    $this->dispose($instance);
+                }
+
+                $this->triggerEvent($id, PoolInterface::EVENT_DESTRUCT, $instance);
+                unset($this->instances[$hash]['instance']);
+            }
+        }
+
+        $this->generators = array();
+        $this->eventsCallbacks = array();
+        $this->instancesHashes = array();
+        $this->instances = array();
     }
 
     /**
@@ -154,5 +169,14 @@ class Pool implements PoolInterface
 
         $this->eventsCallbacks[$id][$event][] = $callback;
         return $this;
+    }
+
+    private function triggerEvent($id, $event, $instance)
+    {
+        if (!empty($this->eventsCallbacks[$id][$event])) {
+            foreach ($this->eventsCallbacks[$id][$event] as $callback) {
+                $callback($instance);
+            }
+        }
     }
 }
