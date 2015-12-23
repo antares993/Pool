@@ -64,6 +64,10 @@ class Pool implements PoolInterface
      */
     public function get($id)
     {
+        if (empty($this->generators[$id])) {
+            throw new \InvalidArgumentException($id." is not a valid pool id.");
+        }
+
         if ($this->instancesHashes[$id]['availableCount'] === 0) {
             $hash = $this->createInstance($id);
             $instance = $this->instances[$hash]['instance'];
@@ -114,6 +118,10 @@ class Pool implements PoolInterface
      */
     public function dispose($instance)
     {
+        if (!is_object($instance)) {
+            throw new \InvalidArgumentException("The pool can only store objects.");
+        }
+
         $hash = spl_object_hash($instance);
         $id = $this->instances[$hash]['id'];
 
@@ -125,6 +133,9 @@ class Pool implements PoolInterface
         return $this;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function clear()
     {
         foreach ($this->instancesHashes as $id => $hashesList) {
@@ -171,8 +182,26 @@ class Pool implements PoolInterface
         return $this;
     }
 
+    /**
+     * Trigger an event.
+     *
+     * @param  string $id
+     * @param  string $event
+     * @param  object $instance
+     */
     private function triggerEvent($id, $event, $instance)
     {
+        $events = array(
+            PoolInterface::EVENT_GET,
+            PoolInterface::EVENT_DISPOSE,
+            PoolInterface::EVENT_CREATE,
+            PoolInterface::EVENT_DESTRUCT
+        );
+
+        if (!in_array($event, $events)) {
+            throw new \InvalidArgumentException("Invalid pool event.");
+        }
+
         if (!empty($this->eventsCallbacks[$id][$event])) {
             foreach ($this->eventsCallbacks[$id][$event] as $callback) {
                 $callback($instance);
