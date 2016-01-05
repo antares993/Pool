@@ -2,6 +2,7 @@
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/77d14077-a55c-4282-8f27-c8475d1bf7da/mini.png)](https://insight.sensiolabs.com/projects/77d14077-a55c-4282-8f27-c8475d1bf7da)
 [![Build Status](https://travis-ci.org/antares993/Pool.svg?branch=master)](https://travis-ci.org/antares993/Pool)
+[![Latest Stable Version](https://poser.pugx.org/antares/pool/v/stable)](https://packagist.org/packages/antares/pool)
 [![License](https://poser.pugx.org/antares/pool/license)](https://packagist.org/packages/antares/pool)
 
 
