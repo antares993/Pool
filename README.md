@@ -8,6 +8,8 @@
 
 This library provides you simple pools. This is especially useful when working with [React](http://reactphp.org/): this way you may share resources such as database connections and boost your application's performance.
 
+**Suggestions and contributions are welcome!**
+
 ## Install
 
 You can add this library as a dependency using composer this way:
