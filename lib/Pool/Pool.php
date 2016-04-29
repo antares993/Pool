@@ -71,8 +71,7 @@ class Pool implements PoolInterface
         if ($this->instancesHashes[$id]['availableCount'] === 0) {
             $hash = $this->createInstance($id);
             $instance = $this->instances[$hash]['instance'];
-        }
-        else {
+        } else {
             foreach ($this->instancesHashes[$id]['hashes'] as $hash) {
 
                 if ($this->instances[$hash]['available']) {
