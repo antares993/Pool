@@ -48,7 +48,7 @@ class Pool implements PoolInterface
         $this->eventsCallbacks[$id] = array();
 
         if ($eventsCallbacks !== null) {
-            $this->addEventsCallbacks($eventsCallbacks);
+            $this->addEventsCallbacks($id, $eventsCallbacks);
         }
 
         $this->instancesHashes[$id] = array(
@@ -72,14 +72,15 @@ class Pool implements PoolInterface
             $hash = $this->createInstance($id);
             $instance = $this->instances[$hash]['instance'];
         }
+        else {
+            foreach ($this->instancesHashes[$id]['hashes'] as $hash) {
 
-        foreach ($this->instancesHashes[$id]['hashes'] as $hash) {
+                if ($this->instances[$hash]['available']) {
+                    $this->instancesHashes[$id]['availableCount']--;
 
-            if ($this->instances[$hash]['available']) {
-                $this->instancesHashes[$id]['availableCount']--;
-
-                $instance = $this->instances[$hash]['instance'];
-                break;
+                    $instance = $this->instances[$hash]['instance'];
+                    break;
+                }
             }
         }
 
